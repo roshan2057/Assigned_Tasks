@@ -197,6 +197,8 @@ const SearchProduct = (req, res) => {
   const type = req.query.type;
   const sortby = req.query.sortby;
 
+  console.log(search_value);
+
   fs.readFile(product_path, "utf-8", (error, result) => {
     if (error) {
       return res.send(error);
@@ -212,7 +214,6 @@ const SearchProduct = (req, res) => {
       filter_result = filter_result.sort((a, b) => {
         return a.price - b.price;
       });
-      console.log("price");
     }
 
     // filter product by type

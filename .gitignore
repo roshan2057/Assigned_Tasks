@@ -1,4 +1,4 @@
 .vscode
 
 **/node_modules/
-Express CRUD (task-3)/product.json
+Express CRUD (task-3)/src/JsonFile/*

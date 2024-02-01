@@ -1,10 +1,8 @@
-const fs = require("fs");
 // this helps to use async and a wait in fs function
 // const fs = require("fs").promises;
+const store = require("../Service/Product");
 
-const product_path = "./src/JsonFile/product.json";
-
-const AddProduct = (req, res) => {
+const AddProduct = async (req, res) => {
   const data = [
     {
       id: 1,
@@ -98,24 +96,24 @@ const AddProduct = (req, res) => {
       product_type: "Grocery",
     },
   ];
-  fs.writeFile(product_path, JSON.stringify(data), (error) => {
-    if (error) {
-      console.error(error);
-    }
-    res.send("Created");
-  });
+  try {
+    const add = await store.create(data);
+    res.send(add);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const GetProduct = (req, res) => {
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    res.send(JSON.parse(result));
-  });
+const GetProduct = async (req, res) => {
+  try {
+    const data = await store.read();
+    res.send(data);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const UpdateProduct = (req, res) => {
+const UpdateProduct = async (req, res) => {
   const id = parseInt(req.query.id) || 10;
 
   // update the value here
@@ -127,146 +125,65 @@ const UpdateProduct = (req, res) => {
     quantity: 55,
     product_type: "This is updated type",
   };
-
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    const newdata = JSON.parse(result).map((product) => {
-      return product.id == id ? data : product;
-    });
-
-    fs.writeFile(product_path, JSON.stringify(newdata), (error) => {
-      if (error) {
-        console.error(error);
-      }
-      res.send("Updated");
-    });
-  });
+  try {
+    const update = await store.update(id, data);
+    res.send(update);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const EditProduct = (req, res) => {
+const EditProduct = async (req, res) => {
   const id = parseInt(req.query.id) || 9;
-
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    const data = JSON.parse(result).find((product) => {
-      return product.id === id;
-    });
-
-    // update the value here
-    data.price = 1000;
-    data.name = "Full Sleev Hoodies";
-
-    const newdata = JSON.parse(result).map((product) => {
-      return product.id == id ? data : product;
-    });
-
-    fs.writeFile(product_path, JSON.stringify(newdata), (error) => {
-      if (error) {
-        console.error(error);
-      }
-      res.send("patched sucessfull");
-    });
-  });
+  try {
+    const edit = await store.edit(id);
+    res.send(edit);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const DeleteProduct = (req, res) => {
+const DeleteProduct = async (req, res) => {
   const id = parseInt(req.query.id) || 2;
-
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    const newdata = JSON.parse(result).filter((product) => {
-      return product.id !== id;
-    });
-    fs.writeFile(product_path, JSON.stringify(newdata), (error, data) => {
-      if (error) {
-        return res.send(error);
-      }
-      res.send("Deleted sucessfully");
-    });
-  });
+  try {
+    const remove = await store.delete(id);
+    res.send(remove);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const SearchProduct = (req, res) => {
+const SearchProduct = async (req, res) => {
   const search_value = req.query.search || "s24";
   const type = req.query.type;
   const sortby = req.query.sortby;
-
-  console.log(search_value);
-
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    let filter_result = JSON.parse(result).filter(
-      (product) =>
-        product.name.toLowerCase().includes(search_value.toLowerCase()) ||
-        product.description.toLowerCase().includes(search_value.toLowerCase())
-    );
-
-    // sort by price
-    if (sortby.toLowerCase() == "price") {
-      filter_result = filter_result.sort((a, b) => {
-        return a.price - b.price;
-      });
-    }
-
-    // filter product by type
-    if (type) {
-      filter_result = filter_result.filter((product) => {
-        return product.product_type.toLowerCase() === type.toLowerCase();
-      });
-      // console.log(filter_result)
-    }
-    res.send(filter_result);
-  });
+  try {
+    const data = await store.search(search_value, type, sortby);
+    res.send(data);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const UpdateQuantity = (req, res) => {
+const UpdateQuantity = async (req, res) => {
   const id = parseInt(req.query.id);
   const newquantity = parseInt(req.query.quantity);
-
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    let data = JSON.parse(result).find((product) => {
-      // console.log(product)
-      return product.id === id;
-    });
-
-    // update the value here
-    data.quantity = newquantity;
-
-    const newdata = JSON.parse(result).map((product) => {
-      return product.id == id ? data : product;
-    });
-
-    fs.writeFile(product_path, JSON.stringify(newdata), (error) => {
-      if (error) {
-        console.error(error);
-      }
-      res.send("Quantity update sucessfully");
-    });
-  });
+  try {
+    const update = await store.update_quantity(id, newquantity);
+    res.send(update);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
-const OutOfStock = (req, res) => {
-  const quantity = 5;
-  fs.readFile(product_path, "utf-8", (error, result) => {
-    if (error) {
-      return res.send(error);
-    }
-    const outofstock = JSON.parse(result).filter((product) => {
-      return product.quantity < quantity;
-    });
-    res.send(outofstock);
-  });
+const OutOfStock = async (req, res) => {
+  try {
+    const quantity = 5;
+    const stock = await store.stock(quantity);
+    res.send(stock);
+  } catch (error) {
+    res.send(error);
+  }
 };
 
 module.exports = {

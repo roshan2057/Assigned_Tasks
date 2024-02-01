@@ -1,29 +1,24 @@
-const fs = require("fs").promises;
-const GetId = require("../Helper/unique_id");
-const file_path = "./src/JsonFile/user.json";
+const store = require("../Service/User");
 
 const AddUser = async (req, res) => {
   const user = {
-    name: "roshan",
+    name: "kho",
     email: "rohsan@gmail.com",
     password: "itsnotencrypted",
   };
+
   try {
-    const data = JSON.parse(await fs.readFile(file_path, "utf-8"));
-    user.id = await GetId();
-    data.push(user);
-    await fs.writeFile(file_path, JSON.stringify(data));
-  } catch {
-    user.id = 1;
-    await fs.writeFile(file_path, "[" + JSON.stringify(user) + "]");
+    const add = await store.create(user);
+    res.send(add);
+  } catch (error) {
+    res.send(error);
   }
-  res.send("Created");
 };
 
 const GetUser = async (req, res) => {
   try {
-    const users = JSON.parse(await fs.readFile(file_path, "utf-8"));
-    res.send(users);
+    const data = await store.read();
+    res.send(data);
   } catch (error) {
     res.send(error);
   }
@@ -39,10 +34,8 @@ const UpdateUser = async (req, res) => {
     id: id,
   };
   try {
-    const data = JSON.parse(await fs.readFile(file_path, "utf-8"));
-    const newdata = data.map((data) => (data.id === id ? newvalue : data));
-    await fs.writeFile(file_path, JSON.stringify(newdata));
-    res.send("Updated");
+    const update = await store.update(id, newvalue);
+    res.send(update);
   } catch (error) {
     res.send(error);
   }
@@ -51,10 +44,8 @@ const UpdateUser = async (req, res) => {
 const DeleteUser = async (req, res) => {
   const id = parseInt(req.query.id) || 1;
   try {
-    const data = JSON.parse(await fs.readFile(file_path, "utf-8"));
-    const newdata = data.filter((data) => data.id !== id);
-    await fs.writeFile(file_path, JSON.stringify(newdata));
-    res.send("Deleted");
+    const remove = await store.delete(id);
+    res.send(remove);
   } catch (error) {
     res.send(error);
   }

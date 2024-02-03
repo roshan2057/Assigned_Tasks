@@ -1,11 +1,7 @@
 const store = require("../Service/User");
 
 const AddUser = async (req, res) => {
-  const user = {
-    name: "kho",
-    email: "rohsan@gmail.com",
-    password: "itsnotencrypted",
-  };
+  const user = req.body;
 
   try {
     const add = await store.create(user);
@@ -25,14 +21,9 @@ const GetUser = async (req, res) => {
 };
 
 const UpdateUser = async (req, res) => {
-  const id = parseInt(req.query.id) || 1;
+  const id = req.query.id || "65bbb06dfd618861ee184fff";
   //new value
-  const newvalue = {
-    name: "roshan(updated)",
-    email: "rohsan@gmail.com(updated)",
-    password: "itsnotencrypted(updated)",
-    id: id,
-  };
+  const newvalue = req.body;
   try {
     const update = await store.update(id, newvalue);
     res.send(update);
@@ -42,7 +33,7 @@ const UpdateUser = async (req, res) => {
 };
 
 const DeleteUser = async (req, res) => {
-  const id = parseInt(req.query.id) || 1;
+  const id = req.query.id || "65ba63b859e833bc257689ff";
   try {
     const remove = await store.delete(id);
     res.send(remove);

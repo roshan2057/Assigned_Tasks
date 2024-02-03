@@ -10,8 +10,8 @@ const OrderHistory = async (req, res) => {
 };
 
 const Add_to_cart = async (req, res) => {
-  const userid = 3;
-  const item = { product: 10, quantity: 5, price: 40 };
+  const userid = req.query.id;
+  const item = { product: '65bbb5c5ed1797f1b04eaeff', quantity: 5, price: 40 };
   try {
     const add = await store.add_tocart(userid, item);
     res.send(add);
@@ -22,7 +22,7 @@ const Add_to_cart = async (req, res) => {
 
 const Place_Order = async (req, res) => {
   const threshold_price = 200;
-  const userid = 3;
+  const userid = req.query.id;
   try {
     const data = await store.place_order(threshold_price, userid);
     res.send(data);

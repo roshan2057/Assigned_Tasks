@@ -187,12 +187,9 @@ class DBStore {
         throw error;
       });
   }
-  edit(id) {
+  edit(id,data) {
     {
-      const data = {
-        name: "patch",
-        price: 200,
-      };
+     
       return this.Product.findByIdAndUpdate(id, { $set: data }, { new: true })
         .then((data) => {
           return "updated in DB";
